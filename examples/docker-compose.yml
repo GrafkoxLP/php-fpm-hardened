@@ -1,0 +1,84 @@
+# Example: nginx (unprivileged) in front of php-fpm-hardened.
+#
+#   browser/reverse proxy --> nginx :8080 --(fastcgi, internal net)--> php :9000 --(internal net)--> db
+#
+# Place your application in ./app (served as /var/www/html in both containers).
+
+name: php-app
+
+services:
+  nginx:
+    image: nginxinc/nginx-unprivileged:stable-alpine
+    restart: unless-stopped
+    depends_on:
+      - php
+    ports:
+      # Expose only on localhost; put a TLS-terminating reverse proxy in front.
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./app:/var/www/html:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - frontend
+      - fastcgi
+
+  php:
+    image: ghcr.io/grafkoxlp/php-fpm-hardened:8.5
+    restart: unless-stopped
+    user: "99:100"
+    environment:
+      PHP_OPEN_BASEDIR: /var/www/html:/tmp
+    volumes:
+      - ./app:/var/www/html:ro
+      # Optional local overrides, loaded after the image's hardening config:
+      # - ./zzz-local.ini:/usr/local/etc/php/conf.d/zzz-local.ini:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - fastcgi
+      - backend
+
+  # Example database, only reachable from the PHP container.
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: app
+      MARIADB_USER: app
+      MARIADB_PASSWORD_FILE: /run/secrets/db_password
+      MARIADB_RANDOM_ROOT_PASSWORD: "1"
+    secrets:
+      - db_password
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - backend
+
+networks:
+  # Only nginx is attached to a network with outbound/host access.
+  frontend: {}
+  # nginx <-> php-fpm, no internet access.
+  fastcgi:
+    internal: true
+  # php-fpm <-> database, no internet access.
+  backend:
+    internal: true
+
+volumes:
+  db-data: {}
+
+secrets:
+  db_password:
+    file: ./db_password.txt
