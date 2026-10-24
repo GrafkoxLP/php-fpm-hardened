@@ -1,0 +1,4 @@
+# Only the Dockerfile and conf/ are needed in the build context.
+*
+!Dockerfile
+!conf/
