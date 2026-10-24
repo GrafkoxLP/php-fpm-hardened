@@ -115,6 +115,9 @@ networks:
 nginx and PHP-FPM must see the application under the same path (`/var/www/html`), because
 nginx passes `SCRIPT_FILENAME` to FPM.
 
+For front-controller apps (Laravel, Symfony, …), the nginx example also contains a commented-out,
+stricter variant that only passes `/index.php` to PHP-FPM and answers every other `.php` request with 404.
+
 ### Local overrides
 
 Mount an additional ini file named `zzz-local.ini`; it is loaded after the image's
@@ -154,8 +157,12 @@ the image, and manually via *Run workflow* (with an optional `force` input).
    container becomes ready with production-like flags (`--read-only`, tmpfs, `--cap-drop ALL`,
    `no-new-privileges`, `--user 99:100`). **If any test fails, nothing is pushed.**
 4. **Push** – Exactly the tested image is tagged `8.5`, `8.5.x` and `latest` and pushed to GHCR.
-5. **Scan** – Trivy scans the image for fixable `CRITICAL`/`HIGH` vulnerabilities. The scan is
+5. **Scan** – A separate job scans the pushed image (by digest) with Trivy for fixable
+   `CRITICAL`/`HIGH` vulnerabilities. It only has read access to packages and no registry
+   login, so even a compromised scanner could not push a tampered image. The scan is
    informational (non-blocking); results appear in the repository's *Security* tab.
+
+All actions are pinned to full commit SHAs (with a version comment for Dependabot).
 
 Because a new image is only pushed when something actually changed, tools that watch registry
 digests (Watchtower, Arcane, Renovate, …) update the container exactly when the upstream image
