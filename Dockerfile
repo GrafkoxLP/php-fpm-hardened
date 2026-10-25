@@ -3,7 +3,10 @@
 ARG PHP_BASE=php:8.5-fpm-alpine
 FROM ${PHP_BASE}
 
-RUN docker-php-ext-install pdo_mysql \
+# Pull in Alpine security fixes that are already released but not yet part of
+# the official base image (e.g. brotli-libs for CVE-2026-111497).
+RUN apk upgrade --no-cache \
+ && docker-php-ext-install pdo_mysql \
  && mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 
 COPY conf/zz-hardening.ini /usr/local/etc/php/conf.d/zz-hardening.ini

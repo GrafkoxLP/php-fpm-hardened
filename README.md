@@ -63,6 +63,8 @@ Applied on top of `php.ini-production`.
 
 ### Image / runtime
 
+- Alpine packages are upgraded at build time (`apk upgrade`), so security fixes already
+  released by Alpine are included even before the official base image is rebuilt.
 - Default user is `www-data` instead of root; deployments can override it (e.g. `user: "99:100"`).
 - Designed for and tested with `read_only`, a tmpfs on `/tmp`, `cap_drop: [ALL]`,
   `no-new-privileges` and an arbitrary non-root UID/GID.
