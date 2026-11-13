@@ -1,6 +1,6 @@
 # php-fpm-hardened
 
-[![Build](https://github.com/GrafkoxLP/php-fpm-hardened/actions/workflows/build.yml/badge.svg)](https://github.com/GrafkoxLP/php-fpm-hardened/actions/workflows/build.yml)
+[![Build](https://github.com/Grafkox/php-fpm-hardened/actions/workflows/build.yml/badge.svg)](https://github.com/Grafkox/php-fpm-hardened/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Hardened PHP-FPM image based on the official `php:8.5-fpm-alpine`, with `pdo_mysql`
@@ -9,7 +9,7 @@ official base image changes (or this repository changes), so a tag only moves wh
 is something new to deploy.
 
 ```
-ghcr.io/grafkoxlp/php-fpm-hardened:8.5
+ghcr.io/grafkox/php-fpm-hardened:8.5
 ```
 
 The image is meant to run behind a separate web server (e.g.
@@ -96,7 +96,7 @@ services:
     networks: [frontend, fastcgi]
 
   php:
-    image: ghcr.io/grafkoxlp/php-fpm-hardened:8.5
+    image: ghcr.io/grafkox/php-fpm-hardened:8.5
     user: "99:100"
     environment:
       PHP_OPEN_BASEDIR: /var/www/html:/tmp
@@ -148,7 +148,7 @@ the image, and manually via *Run workflow* (with an optional `force` input).
 1. **Check** – Resolves the current index digest (manifest list) of
    `docker.io/library/php:8.5-fpm-alpine` and compares it with the
    `org.opencontainers.image.base.digest` label of the published
-   `ghcr.io/grafkoxlp/php-fpm-hardened:8.5`. If they match (and the run was neither a push
+   `ghcr.io/grafkox/php-fpm-hardened:8.5`. If they match (and the run was neither a push
    nor forced), the run ends with *Base unchanged – skipping build*.
 2. **Build** – The base image is pinned by that digest (`PHP_BASE=php:8.5-fpm-alpine@sha256:…`),
    so the label always matches the base that was actually used. The image gets OCI labels

@@ -28,7 +28,7 @@ concurrency:
 
 env:
   BASE_IMAGE: docker.io/library/php:8.5-fpm-alpine
-  IMAGE: ghcr.io/grafkoxlp/php-fpm-hardened
+  IMAGE: ghcr.io/grafkox/php-fpm-hardened
   MINOR_TAG: "8.5"
 
 jobs:

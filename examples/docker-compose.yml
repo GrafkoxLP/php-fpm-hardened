@@ -30,7 +30,7 @@ services:
       - fastcgi
 
   php:
-    image: ghcr.io/grafkoxlp/php-fpm-hardened:8.5
+    image: ghcr.io/grafkox/php-fpm-hardened:8.5
     restart: unless-stopped
     user: "99:100"
     environment:
